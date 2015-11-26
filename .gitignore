@@ -4,9 +4,20 @@
 /dist
 /tmp
 
+#charly
+.README.md.swp
+.swp
+nwjs-v0.12.2-linux-x64.tar.gz
+nwjs-v0.12.2-linux-x64/
+tests/acceptance/
+
 # dependencies
 /node_modules
 /bower_components
+pilasweb
+blockly
+ejerciciosPilas
+
 
 # misc
 /.sass-cache
@@ -17,9 +28,12 @@ npm-debug.log
 testem.log
 
 public/libs/data
-
 public/libs/pilasweb.js
 
-distribuibles
-cache
-extras/nodewebkit-bins
+dist_web
+dist_website
+
+webkitbuilds
+
+log_descompresion.log
+*.pyc

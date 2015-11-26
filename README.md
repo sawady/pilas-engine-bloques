@@ -1,39 +1,46 @@
 pilas-engine-bloques
 ====================
 
-Una aplicación experimental para fomentar el aprendizaje
-de la programación usando [pilas-engine](http://www.pilas-engine.com.ar) y
-[blockly](https://developers.google.com/blockly/) (estamos usando una versión propia de [blockly](https://github.com/sawady/blockly)).
+- Rama master: [![Build Status](https://travis-ci.org/Program-AR/pilas-engine-bloques.svg?branch=master)](https://travis-ci.org/Program-AR/pilas-engine-bloques)
+- Rama develop (principal): [![Build Status](https://travis-ci.org/Program-AR/pilas-engine-bloques.svg?branch=develop)](https://travis-ci.org/Program-AR/pilas-engine-bloques)
 
+Esta es una versión hermana de [pilas-engine](http://www.pilas-engine.com.ar) pero
+utilizando bloques, javascript y desafíos para aprender a programar.
 
-![](preview/main.png)
+![](screenshots/1.png)
 
+![](screenshots/2.png)
 
+¿Cómo empezar?
+--------------
 
-Instalación para desarrolladores
---------------------------------
+Al clonar el repositorio, podrías escribir el comando ``make``
+para ver las tareas disponibles:
 
-Antes de comenzar, necesitas tener instalado ``nodejs`` (que
-viene con ``npm`` incluido) y las dependencias ``bower``, ``grunt``, ``grunt-cli`` y ``ember-cli``.
+![](public/make.png)
 
-Para instalar ``nodejs`` podés leer el [siguiente tutorial de instalación](http://examplelab.com.ar/como-instalar-nodejs-en-huayra-linux/), y
-para instalar las otras dependencias podés ejecutar los comandos:
-
-```
-sudo npm install -g bower grunt grunt-cli ember-cli
-```
-
-Luego, para instalar la aplicación en sí:
+Por ejemplo, luego de clonar podrías completar todo el proceso ejecutando
+estos comandos:
 
 ```
-git clone http://github.com/hugoruscitti/pilas-engine-bloques
-cd pilas-engine-bloques
-npm install
-bower install
+make iniciar
+make full
+make test_mac
 ```
 
-Una vez hecho esto, invocando a ``make`` vas a ver los comandos más comunes para
-utilizar, y si algo de lo que querés hacer no está ahí, también vas a poder
-usar los comandos ``ember``, ``npm`` o ``grunt``.
 
-Antes de ejecutar ``make actualizar`` necesitás bajar los repos de Pilasweb y Blockly (este a su vez necesita bajar closure de Google). Haciendo ``make bajar_dependencias`` se clonan los repos correspondientes, que se ubican en el mismo nivel en el que se encuentre la carpeta de Pilas-bloques.
+Tests
+-----
+
+Para ejecutar los tests de la aplicación hay dos comandos principales, podemos ejecutar los tests de forma constante con este comando:
+
+```
+  make test
+```
+
+o ejecutar los test una sola vez usando el siguiente comando:
+
+
+```
+  ember nw:test
+```

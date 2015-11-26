@@ -1,9 +1,9 @@
 import Ember from 'ember';
-
-export default Ember.ObjectController.extend({
+/*global model*/
+export default Ember.Controller.extend({
   edicion: false,
   actions: {
-    guardar: function() {
+    guardar() {
       var record = this.store.find('preferencium', {tipo: 'principal'});
       record.save();
 
@@ -12,7 +12,7 @@ export default Ember.ObjectController.extend({
       });
 
     },
-    editar: function() {
+    editar() {
       this.set('edicion', true);
     },
   }

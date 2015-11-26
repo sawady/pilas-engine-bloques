@@ -3,10 +3,15 @@
     "document",
     "window",
     "-Promise",
-    "pilas",
+    "Bootstrap",
     "require",
+    "$",
+    "Blockly",
+    "pilas",
     "pilasengine",
-    "Blockly"
+    "Base",
+    "debugger",
+    "ElRecolectorDeEstrellas"
   ],
   "browser": true,
   "boss": true,

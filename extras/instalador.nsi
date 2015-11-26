@@ -13,7 +13,7 @@
 
   ;Name and file
   Name "pilas-engine-bloques"
-  OutFile "pilas-engine-bloques_0.1.6.exe"
+  OutFile "pilas-engine-bloques.exe"
 
   ;Default installation folder
   InstallDir "c:\pilas-engine-bloques"
@@ -53,7 +53,7 @@
 
   !insertmacro MUI_PAGE_INSTFILES
 
-!define MUI_FINISHPAGE_RUN "$instdir\pilas-engine-bloques.exe"
+!define MUI_FINISHPAGE_RUN "$instdir\nw.exe"
 
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW ModifyRunCheckbox
 !insertmacro MUI_PAGE_FINISH
@@ -84,14 +84,7 @@ Section "Dummy Section" SecDummy
 
   SetOutPath "$INSTDIR"
 
-  File "ffmpegsumo.dll"
-  File "icudtl.dat"
-  File "nw.pak"
-  File "libEGL.dll"
-  File "pilas-engine-bloques.exe"
-  File "libGLESv2.dll"
-  File /r "locales"
-
+  File /r *
 
   ;Store installation folder
   WriteRegStr HKCU "pilas-engine-bloques\pilas-engine-bloques " "" $INSTDIR
@@ -104,7 +97,7 @@ Section "Dummy Section" SecDummy
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
     CreateShortcut "$SMPROGRAMS\$StartMenuFolder\desinstalar.lnk" "$INSTDIR\desinstalar.exe"
-    CreateShortCut "$SMPROGRAMS\$StartMenuFolder\pilas-engine-bloques.lnk" "$INSTDIR\pilas-engine-bloques.exe"
+    CreateShortCut "$SMPROGRAMS\$StartMenuFolder\pilas-engine-bloques.lnk" "$INSTDIR\nw.exe"
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
