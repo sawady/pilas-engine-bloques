@@ -16,11 +16,13 @@ var Actividad = Ember.Object.extend({
   init() {
     var actividad = this.get('actividad');
     this.set('nombre', actividad.nombre);
+    this.set('id', actividad.id);
     this.set('enunciado', actividad.enunciado);
     this.set('escena', actividad.escena);
     this.set('puedeComentar', actividad.puedeComentar);
     this.set('puedeDesactivar', actividad.puedeDesactivar);
     this.set('puedeDuplicar', actividad.puedeDuplicar);
+    this.set('esDeExploracion', actividad.esDeExploracion);
     this.setColours();
     this.pisar_bloques_blockly();
   },
@@ -36,24 +38,7 @@ var Actividad = Ember.Object.extend({
     var act = this.get('actividad');
     var leng = Lenguaje.create();
 
-    var bloques_para_toolbox = {
-      Acciones: 'acciones',
-      Sensores: 'sensores',
-      Control: 'control',
-      Expresiones: 'expresiones',
-      Variables: 'variables',
-      Subtareas: 'subtareas'
-    };
-
-    // Itera por todos los bloques y los agrega al toolbox solamente
-    // si tienen piezas para mostrar.
-    for (let key in bloques_para_toolbox) {
-      let propiedad = bloques_para_toolbox[key];
-
-      if (act[propiedad].length > 0) {
-        leng.agregar(key, act[propiedad]);
-      }
-    }
+    act.bloques.forEach(claseBloque => leng.agregarBloque(claseBloque));
 
     return leng.build();
   },
@@ -79,32 +64,30 @@ var Actividad = Ember.Object.extend({
   },
 
   usa_procedimientos() {
-    return this.get('actividad').subtareas.indexOf(Procedimiento) > -1;
+    return this.get('actividad').bloques.indexOf(Procedimiento) > -1;
 
   },
 
   usa_funciones() {
-    return this.get('actividad').subtareas.indexOf(Funcion) > -1;
+    return this.get('actividad').bloques.indexOf(Funcion) > -1;
   },
 
   iniciarBlockly(contenedor) {
-    var actividad = this;
 
     Blockly.inject(contenedor, {
       collapse: false,
-      duplicate: actividad.get('puedeDuplicar'),
+      duplicate: this.get('puedeDuplicar'),
       trashOnlyDelete: true,
-      disable: actividad.get('puedeDesactivar'),
-      comments: actividad.get('puedeComentar'),
-      rgbColours: true,
+      disable: this.get('puedeDesactivar'),
+      comments: this.get('puedeComentar'),
       defsOnly: true,
-      def_procedures: actividad.usa_procedimientos(),
-      def_functions: actividad.usa_funciones(),
+      def_procedures: this.usa_procedimientos(),
+      def_functions: this.usa_funciones(),
       globalVariables: false,
       oneReturnOnly: true,
       defsNames: ['al_empezar_a_ejecutar', 'procedures_defnoreturn', 'procedures_defreturn'],
       path: './libs/blockly/',
-      toolbox: Blockly.Xml.textToDom(actividad.obtenerLenguaje()),
+      toolbox: Blockly.Xml.textToDom(this.obtenerLenguaje()),
     });
 
     this.crear_bloques_iniciales();
@@ -126,6 +109,22 @@ var Actividad = Ember.Object.extend({
     return code;
   },
 
+  generarCodigoXMLComoString() {
+    Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+    var codigo = this.generarCodigoXML();
+
+    function xml2string(node) {
+       if (typeof(XMLSerializer) !== 'undefined') {
+          var serializer = new XMLSerializer();
+          return serializer.serializeToString(node);
+       } else if (node.xml) {
+          return node.xml;
+       }
+    }
+
+    return xml2string(codigo);
+  },
+
   cargarCodigoDesdeStringXML(codigo) {
     var workspace = Blockly.getMainWorkspace();
     workspace.clear();
@@ -133,25 +132,34 @@ var Actividad = Ember.Object.extend({
     Blockly.Xml.domToWorkspace(workspace, xml);
   },
 
+  estaResueltoElProblema(){
+    return this.get('escena_instanciada').estaResueltoElProblema();
+  },
+
+  debeFelicitarse(){
+    return this.estaResueltoElProblema() && !this.get('esDeExploracion');
+  },
+
   // Scratch style colours
   setColours() {
-    Blockly.Blocks.primitivas.COLOUR = '#4a6cd4';
-    Blockly.Blocks.sensores.COLOUR = '#2ca5e2';
-    Blockly.Blocks.eventos.COLOUR = '#00a65a'; // == boton ejecutar
-    Blockly.Blocks.math.COLOUR = '#49930e';
-    Blockly.Blocks.logic.COLOUR = '#5cb712';
-    Blockly.Blocks.loops.COLOUR = '#ee7d16';
+    /*global goog */
+    Blockly.Blocks.primitivas.COLOUR =  goog.color.hexToHsv('#4a6cd4');
+    Blockly.Blocks.sensores.COLOUR = goog.color.hexToHsv('#2ca5e2');
+    Blockly.Blocks.eventos.COLOUR = goog.color.hexToHsv('#00a65a'); // == boton ejecutar
+    Blockly.Blocks.math.COLOUR = goog.color.hexToHsv('#49930e');
+    Blockly.Blocks.logic.COLOUR = goog.color.hexToHsv('#5cb712');
+    Blockly.Blocks.loops.COLOUR = goog.color.hexToHsv('#ee7d16');
 
-    Blockly.Blocks.procedures.COLOUR = '#6C52EB';
+    Blockly.Blocks.procedures.COLOUR = goog.color.hexToHsv('#6C52EB');
     //Blockly.Blocks.procedures.vars.COLOUR = '#8a55d7';
     //Blockly.Blocks.procedures.params.COLOUR = '#6C52EB';
 
 
-    Blockly.Blocks.variables.COLOUR = '#cc5b22';
+    Blockly.Blocks.variables.COLOUR = goog.color.hexToHsv('#cc5b22');
 
-    Blockly.Blocks.texts.COLOUR = '#4a6cd4';
-    Blockly.Blocks.lists.COLOUR = '#cc5b22';
-    Blockly.Blocks.colour.COLOUR = '#4a6cd4';
+    Blockly.Blocks.texts.COLOUR = goog.color.hexToHsv('#4a6cd4');
+    Blockly.Blocks.lists.COLOUR = goog.color.hexToHsv('#cc5b22');
+    Blockly.Blocks.colour.COLOUR = goog.color.hexToHsv('#4a6cd4');
 
     // IN SCRATCH THE COLOURS ARE
     // 4a6cd4 MOTION

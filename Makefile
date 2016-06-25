@@ -1,5 +1,5 @@
 
-VERSION=0.9.2
+VERSION=0.11.1
 NOMBRE="pilas-engine-bloques"
 
 N=[0m
@@ -7,6 +7,8 @@ G=[01;32m
 Y=[01;33m
 B=[01;34m
 L=[01;30m
+
+npm_config_loglevel="warn"
 
 comandos:
 	@echo ""
@@ -50,13 +52,13 @@ comandos:
 	@echo "    ${G}subir_version${N}   Sube version generada al servidor."
 	@echo ""
 	@echo "    ${G}binarios${N}          Genera los binarios."
-	@echo "    ${G}upload_to_dropbox${N} Sube los binarios generados a dropbox."
+	@echo "    ${G}subir_a_dropbox${N}   Sube los binarios generados a dropbox."
 	@echo ""
 
 
 iniciar:
 	@echo "${G}instalando dependencias ...${N}"
-	npm install
+	@npm install
 	./node_modules/bower/bin/bower install --allow-root
 
 vincular_dependencias:
@@ -79,40 +81,41 @@ actualizar_pilas:
 
 copiar_pilasweb:
 	@echo "${G}copiando pilasweb${N}"
-	cd pilasweb; make build; cd ..
 	cp -r -f pilasweb/public/data public/libs/
 	cp -r -f pilasweb/public/pilasweb.js public/libs/
 
 actualizar_ejercicios_pilas:
 	@echo "${G}actualizando ejercicios de pilas${N}"
-	cd ejerciciosPilas; git pull; npm install; grunt; cd ..
+	@cd ejerciciosPilas; git pull; echo "${G}Instalando dependencias de ejerciciosPilas${N}"; npm install; cd ..
+	@cd ejerciciosPilas; echo "${G}Compilando ejerciciosPilas${N}"; grunt; cd ..
 	make copiar_ejercicios_pilas
 
 copiar_ejercicios_pilas:
+	@echo "${G}copiando ejerciciosPilas${N}"
 	cp -r -f ejerciciosPilas/compilados/ejerciciosPilas.js public/libs/
 	rm -r -f public/libs/data
 	cp -r -f ejerciciosPilas/src/data public/libs/data
 
 actualizar_blockly:
 	cd blockly; git pull; python build.py; cd ..
-	rm -r -f public/libs/blockly
-	mkdir -p public/libs/blockly
+	rm -rf vendor/libs/blockly
+	mkdir -p vendor/libs/blockly
 	make copiar_blockly_comprimido
 
 
 copiar_blockly_comprimido:
 	# CORE
-	cp -f blockly/blockly_compressed.js public/libs/blockly/
+	cp -f blockly/blockly_compressed.js vendor/libs/blockly/
 	# BLOCKS
-	cp -f blockly/blocks_compressed.js public/libs/blockly/
+	cp -f blockly/blocks_compressed.js vendor/libs/blockly/
 	# JS GENERATOR
-	cp -f blockly/javascript_compressed.js public/libs/blockly/
+	cp -f blockly/javascript_compressed.js vendor/libs/blockly/
 	# MEDIA
 	rm -r -f public/libs/blockly/media
 	cp -r -f blockly/media public/libs/blockly/
 	# LANG
-	rm -r -f public/libs/blockly/msg
-	cp -r -f blockly/msg  public/libs/blockly/
+	rm -r -f vendor/libs/blockly/msg
+	cp -r -f blockly/msg  vendor/libs/blockly/
 
 copiar_blockly_descomprimido:
 	# CORE
@@ -134,6 +137,11 @@ copiar_blockly_descomprimido:
 	rm -r -f public/libs/blockly/msg
 	cp -r -f blockly/msg  public/libs/blockly/
 
+descartar_todo_cambio:
+	cd pilas; git checkout .
+	cd ejerciciosPilas; git checkout .
+	git checkout .
+
 dist: compilar
 
 ejecutar_linux:
@@ -149,8 +157,21 @@ test_mac: ejecutar_mac
 
 build: compilar
 
-compilar:
+compilar: copiar_pilasweb copiar_ejercicios_pilas
+	cd scripts; python generarListaImagenes.py
 	./node_modules/ember-cli/bin/ember build
+
+compilar_todo_pilas:
+	cd ../pilasweb; make build
+	cd ../ejerciciosPilas; grunt
+	make compilar
+
+compilar_todo_y_testear:
+	cd ../pilasweb; make build
+	cd ../ejerciciosPilas; grunt
+	make copiar_pilasweb
+	make copiar_ejercicios_pilas
+	./node_modules/ember-cli/bin/ember test --server
 
 compilar_web:
 	./node_modules/ember-cli/bin/ember build --environment=web --output-path dist_web
@@ -160,7 +181,7 @@ compilar_live:
 
 version:
 	# patch || minor
-	@bumpversion patch --current-version ${VERSION} public/package.json public/package.desarrollo.json public/package.produccion.json Makefile app/services/version.js --list
+	@bumpversion minor --current-version ${VERSION} public/package.json public/package.desarrollo.json public/package.produccion.json Makefile app/services/version.js --list
 	make build
 	@echo "Es recomendable escribir el comando que genera los tags y sube todo a github:"
 	@echo ""
@@ -173,7 +194,7 @@ limpiar_todo:
 	@echo "Limpiando bibliotecas..."
 	@echo "(se reinstalarán a continuación)"
 	@sleep 5s;
-	@rm -rf node_modules/ bower_components/ 
+	@rm -rf node_modules/ bower_components/
 
 full: limpiar_todo iniciar bajar_dependencias vincular_dependencias actualizar_pilas actualizar_blockly actualizar_ejercicios_pilas
 
@@ -232,10 +253,13 @@ binarios: to_production build _compile_osx _compile_win
 	@open webkitbuilds
 	make to_develop
 
-upload_to_dropbox:
+subir_a_dropbox:
+	@echo "OJO, los archivos no se subirán a dropbox."
+	@echo "Ahora se sube a static.pilas-engine.com.ar"
 	mkdir -p ~/Dropbox/Public/releases/pilas-engine-bloques/${VERSION}/
 	mv webkitbuilds/pilas-engine-bloques-${VERSION}.dmg ~/Dropbox/Public/releases/pilas-engine-bloques/${VERSION}/
 	mv webkitbuilds/pilas-engine-bloques-${VERSION}.exe ~/Dropbox/Public/releases/pilas-engine-bloques/${VERSION}/
+	scp -r ~/Dropbox/Public/releases/pilas-engine-bloques/${VERSION} root@162.243.50.192:/home/hugoruscitti/static.pilas-engine.com.ar/pilas-engine-bloques/
+
 
 .PHONY: dist bajar_dependencias
-

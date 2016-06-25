@@ -1,5 +1,5 @@
 import Ember from 'ember';
-
+import {Comandos,MisProcedimientos,Control,Separador,Variables,Sensores,Valores,Operadores,MisFunciones} from 'pilas-engine-bloques/actividades/categorias';
 
 /* ============================================== */
 
@@ -10,82 +10,65 @@ import Ember from 'ember';
 var Lenguaje = Ember.Object.extend({
 
   init() {
-    this.set('categorias', []);
-    this.set('bloques', {});
+    this.set('bloques', []);
   },
 
-  agregar(c, bs) {
-    if(bs !== undefined) {
-      this.categoria(c);
-      bs.forEach(function (b) {
-        this.bloque(c, b);
-      }.bind(this));
-    }
+  agregarBloque(claseBloque) {
+    this.get('bloques').pushObject(this.definir_bloque(claseBloque));
   },
 
-  categoria(c) {
-    this.get('categorias').pushObject(c);
-    var bs = this.get('bloques');
-    bs[c] = [];
-    this.set('bloques', bs);
-  },
-
-  bloque(c, b) {
-    var block = this.definir_bloque(b);
-    this.get('bloques')[c].pushObject(block);
-  },
-
-  definir_bloque(b) {
-    var block = b.create();
+  definir_bloque(claseBloque) {
+    var block = claseBloque.create();
     block.registrar_en_blockly();
     return block;
   },
 
+/*
+Ejemplo con subcategorias:
+ordenCategorias(){
+  return [
+    Titulo('Comandos',[
+      Comandos,
+      MisProcedimientos,
+      Control,
+    ]),
+    Separador,
+    Variables,
+    Separador,
+    Titulo('Expresiones',[
+      Valores,
+      Sensores,
+      Operadores,
+      MisFunciones,
+    ]),
+  ];
+},
+*/
+
+  ordenCategorias(){
+    return [
+      Comandos,
+      MisProcedimientos,
+      Control,
+      Separador,
+      Variables,
+      Separador,
+      Valores,
+      Sensores,
+      Operadores,
+      MisFunciones,
+    ];
+  },
+
   build() {
-    var str_toolbox = '';
-
-    str_toolbox += '<xml>';
-
-    this.get('categorias').forEach(function(item) {
-      if (item === 'Variables') {
-        str_toolbox += this._build_variables();
-      } else if (item === 'Subtareas') {
-        str_toolbox += this._build_procedures();
-      } else {
-        str_toolbox += this._build_categoria(item);
-      }
-    }.bind(this));
-
-    str_toolbox += '</xml>';
-
-    return str_toolbox;
+    var str_toolbox = '<xml>';
+    this.ordenCategorias().forEach(categoria => str_toolbox += this.xmlCategoria(categoria));
+    return str_toolbox + '</xml>';
   },
 
-  _build_categoria(categoria) {
-    var str_category = '';
-
-    str_category += '<category name="x">\n'.replace('x', categoria);
-
-    this.get('bloques')[categoria].forEach(function(b) {
-       str_category += b.build();
-    });
-
-    str_category += '</category>\n';
-
-    return str_category;
-  },
-
-  _build_procedures() {
-    return '<category name="Subtareas" custom="PROCEDURE"></category>';
-  },
-
-  _build_variables() {
-    return '<category name="Variables" custom="VARIABLE"></category>';
+  xmlCategoria(categoria) {
+    return categoria.generarXML(this.get('bloques'));
   }
-
 });
-
-
-
 
 export default Lenguaje;

@@ -1,22 +1,21 @@
 import Ember from 'ember';
-
 import Bloque from 'pilas-engine-bloques/actividades/bloque';
-
+import {MisProcedimientos,Control,Variables,Sensores,MisFunciones} from 'pilas-engine-bloques/actividades/categorias';
 /*
  * Pide implementar sólo block_javascript
  * Sirve para pisar el JS que produce blockly
  */
 var CambioDeJSDeBlocky = Bloque.extend({
-
   registrar_en_blockly() {
-    var myThis = this;
-    Blockly.JavaScript[this.get('id')] = function(block) {
-      return myThis.block_javascript(block);
-    };
-  }
+    // La vista ya está registrada originalmente por el lenguaje Javascript.
+    // Sólo registro la generación diferente de código
+    this.registrarGeneracionJS();
+  },
 });
 
 var VariableGet = CambioDeJSDeBlocky.extend({
+
+  _categoria: Variables,
 
   init() {
     this._super();
@@ -32,8 +31,9 @@ var VariableGet = CambioDeJSDeBlocky.extend({
 
 });
 
-
 var VariableSet = CambioDeJSDeBlocky.extend({
+
+  _categoria: Variables,
 
   init() {
     this._super();
@@ -55,6 +55,8 @@ var VariableSet = CambioDeJSDeBlocky.extend({
 
 var VariableLocalGet = CambioDeJSDeBlocky.extend({
 
+  _categoria: Variables,
+
   init() {
     this._super();
     this.set('id', 'local_var_get');
@@ -72,6 +74,8 @@ var VariableLocalGet = CambioDeJSDeBlocky.extend({
 /* ============================================== */
 
 var VariableLocalSet = CambioDeJSDeBlocky.extend({
+
+  _categoria: Variables,
 
   init() {
     this._super();
@@ -92,6 +96,8 @@ var VariableLocalSet = CambioDeJSDeBlocky.extend({
 /* ============================================== */
 
 var Procedimiento = CambioDeJSDeBlocky.extend({
+
+  _categoria: MisProcedimientos,
 
   init() {
     this._super();
@@ -142,6 +148,8 @@ var Procedimiento = CambioDeJSDeBlocky.extend({
 
 var Funcion = CambioDeJSDeBlocky.extend({
 
+  _categoria: MisFunciones,
+
   init() {
     this._super();
     this.set('id', 'procedures_defreturn');
@@ -157,6 +165,8 @@ var Funcion = CambioDeJSDeBlocky.extend({
 /* ============================================== */
 
 var CallNoReturn = CambioDeJSDeBlocky.extend({
+
+  _categoria: MisProcedimientos,
 
   init() {
     this._super();
@@ -192,6 +202,8 @@ var CallNoReturn = CambioDeJSDeBlocky.extend({
 
 var CallReturn = CambioDeJSDeBlocky.extend({
 
+  _categoria: MisFunciones,
+
   init() {
     this._super();
     this.set('id', 'procedures_callreturn');
@@ -216,6 +228,8 @@ var CallReturn = CambioDeJSDeBlocky.extend({
 /* ============================================== */
 
 var ParamGet = CambioDeJSDeBlocky.extend({
+
+  _categoria: MisProcedimientos,
 
   init() {
     this._super();
@@ -296,13 +310,15 @@ var Accion = Bloque.extend({
     block.setNextStatement(true);
   },
 
-  block_javascript(/*block*/) {
-    return 'programa.hacer(' + this.nombre_comportamiento() + ', ' + this.argumentos() + ')\n';
+  block_javascript(block) {
+    return 'programa.hacer(' + this.nombre_comportamiento() + ', ' + this.argumentos(block) + ')\n';
   }
 
 });
 
 var Sensor = Bloque.extend({
+
+  _categoria: Sensores,
 
   block_init(block) {
     this._super(block);
@@ -314,6 +330,78 @@ var Sensor = Bloque.extend({
   block_javascript(/*block*/) {
     return ['receptor.' + this.nombre_sensor() + '\n', Blockly.JavaScript.ORDER_ATOMIC];
   }
+});
+
+// Crea una accion a partir de una descripcion, un icono, comportamiento y argumentos
+// Como la mayoría de los bloques siempre son así, primero un ícono y luego una descripción,
+// Esto me permite rápidamente crear una accion, es casi como un DSL para hacerlo
+var AccionBuilder = {
+  build(opciones){
+    return Accion.extend({
+      init() {
+        this._super();
+        this.set('id', opciones.id || this.toID(opciones.descripcion));
+      },
+
+      block_init(block){
+        this._super(block);
+        block.appendDummyInput()
+          .appendField(this.obtener_icono('../libs/data/' + opciones.icono))
+          .appendField(opciones.descripcion);
+      },
+
+      nombre_comportamiento(){
+        return opciones.comportamiento;
+      },
+
+      argumentos(block){ //jshint unused:vars
+        return opciones.argumentos;
+      },
+
+      toID(descripcion){
+        return descripcion.replace(/[^a-zA-z]/g, "");
+      },
+
+    });
+  },
+
+  // TODO: Quitar código repetido con build
+  buildSensor(opciones){
+    return Sensor.extend({
+      init() {
+        this._super();
+        this.set('id', opciones.id || this.toID(opciones.descripcion));
+      },
+
+      block_init(block){
+        this._super(block);
+        block.appendDummyInput()
+             .appendField('¿' + opciones.descripcion)
+             .appendField(this.obtener_icono('../libs/data/' + opciones.icono))
+             .appendField('?');
+      },
+
+      nombre_sensor(){
+        return opciones.funcionSensor;
+      },
+
+      toID(descripcion){
+        return descripcion.replace(/[^a-zA-z]/g, "");
+      },
+    });
+  },
+};
+
+var VariableEspecificaGet = Sensor.extend({
+  _categoria: Variables,
+
+  block_init(block){
+    this._super(block);
+    block.setColour(Blockly.Blocks.variables.COLOUR);
+    block.appendDummyInput()
+      .appendField(this.descripcion());
+  },
+
 });
 
 /*
@@ -353,6 +441,8 @@ var ParamCampo = Ember.Object.extend({
 
 var EstructuraDeControl = Bloque.extend({
 
+  _categoria: Control,
+
   block_init(block) {
     this._super(block);
     block.setColour(Blockly.Blocks.loops.COLOUR);
@@ -376,7 +466,7 @@ var Repetir = EstructuraDeControl.extend({
     this._super(block);
     block.appendValueInput('count')
         .setCheck('Number')
-        .appendField('repetir');
+        .appendField('Repetir');
     block.appendStatementInput('block');
   },
 
@@ -403,6 +493,12 @@ var Repetir = EstructuraDeControl.extend({
 
 });
 
+var RepetirVacio = Repetir.extend({
+  get_parametros(){
+    return [];
+  }
+});
+
 var Si = EstructuraDeControl.extend({
 
   init() {
@@ -414,7 +510,7 @@ var Si = EstructuraDeControl.extend({
     this._super(block);
     block.appendValueInput('condition')
         .setCheck('Boolean')
-        .appendField('si');
+        .appendField('Si');
     block.appendStatementInput('block');
   },
 
@@ -442,10 +538,10 @@ var Sino = EstructuraDeControl.extend({
     this._super(block);
     block.appendValueInput('condition')
         .setCheck('Boolean')
-        .appendField('si');
+        .appendField('Si');
     block.appendStatementInput('block1');
     block.appendDummyInput()
-        .appendField('sino');
+        .appendField('si no');
     block.appendStatementInput('block2');
   },
 
@@ -474,7 +570,7 @@ var Hasta = EstructuraDeControl.extend({
     this._super(block);
     block.appendValueInput('condition')
         .setCheck('Boolean')
-        .appendField('repetir hasta que');
+        .appendField('Repetir hasta que');
     block.appendStatementInput('block');
   },
 
@@ -489,10 +585,7 @@ var Hasta = EstructuraDeControl.extend({
 
 });
 
-
-var bloques = {Bloque, CambioDeJSDeBlocky, VariableGet,
+export {Bloque, CambioDeJSDeBlocky, VariableGet, VariableEspecificaGet,
                VariableSet, VariableLocalGet, VariableLocalSet, Procedimiento,
-               Funcion, CallNoReturn, CallReturn, ParamGet, AlEmpezar, Accion,
-               Sensor, Repetir,Si,Sino,Hasta, ParamCampo};
-
-export default bloques;
+               Funcion, CallNoReturn, CallReturn, ParamGet, AlEmpezar, Accion, AccionBuilder,
+               Sensor, Repetir, RepetirVacio, Si,Sino,Hasta, ParamCampo, ParamValor};

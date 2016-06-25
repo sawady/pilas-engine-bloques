@@ -1,34 +1,18 @@
-/* globals ElMonoQueSabeContar */
-import bloques from 'pilas-engine-bloques/actividades/bloques';
-import direcciones from 'pilas-engine-bloques/actividades/direccionesCuadricula';
-import tocando from 'pilas-engine-bloques/actividades/tocando';
-import contando from 'pilas-engine-bloques/actividades/contando';
-var {Si, Repetir, Procedimiento} = bloques;
-var {IrArriba, IrAbajo} = direcciones;
-var {TocandoBanana, TocandoManzana} = tocando;
-var {ContandoBanana, ContandoManzana} = contando;
+import {comunes,EstoyAlFin} from 'pilas-engine-bloques/actividades/bloquesMonoContando';
 
-
-
-
-var actividadElMonoQueSabeContar = {
-  nombre: 'El Mono que sabe contar',
-  enunciado: 'COMPLETAR',
-  consignaInicial: 'COMPLETAR.',
+export default {
+  nombre: 'El mono que sabe contar',
+  id: 'ElMonoQueSabeContar',
+  enunciado: 'El mono debe recorrer todas las casillas y contar cuántas bananas y manzanas hay en total. Pista: primero pensá cómo contarías si hay una manzana o una banana en una casilla determinada. Luego pensá cómo harías para contar todas las frutas de una sola columna.',
+  consignaInicial: 'Subdividir un problema grande en problemas más pequeños ayuda a comprender mejor cada una de las partes que lo componen. Además nos permite concentrarnos en resolver cuestiones más sencillas al problema original.',
 
   // la escena proviene de ejerciciosPilas
+  /* globals ElMonoQueSabeContar */
   escena: ElMonoQueSabeContar,  // jshint ignore:line
   puedeComentar: false,
   puedeDesactivar: false,
   puedeDuplicar: false,
-  subtareas: [Procedimiento],
 
-  // TODO: aca irian atributos iniciales que se desean para un personaje
-  variables: [],
-  control: [Si,Repetir],
-  expresiones: [],
-  acciones: [IrArriba,IrAbajo,ContandoBanana,ContandoManzana],
-  sensores: [TocandoBanana,TocandoManzana],
+  bloques: comunes.concat([EstoyAlFin]),
+
 };
-
-export default actividadElMonoQueSabeContar;

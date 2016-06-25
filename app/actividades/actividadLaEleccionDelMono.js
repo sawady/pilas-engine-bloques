@@ -1,5 +1,5 @@
 import bloques from 'pilas-engine-bloques/actividades/bloques';
-var {Accion, Sensor, Sino,Procedimiento} = bloques;
+var {Accion, Sensor, Repetir, Si, Sino, Procedimiento} = bloques;
 
 var Avanzar = Accion.extend({
   init() {
@@ -10,8 +10,8 @@ var Avanzar = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('Avanzar')
-         .appendField(this.obtener_icono('derecha.png'));
+         .appendField(this.obtener_icono('derecha.png'))
+         .appendField('Avanzar');
   },
 
   nombre_comportamiento() {
@@ -34,8 +34,8 @@ var ComerManzana = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('Comer ')
-         .appendField(this.obtener_icono('../libs/data/iconos.manzana.png'));
+         .appendField(this.obtener_icono('../libs/data/iconos.manzana.png'))
+         .appendField('Comer manzana ');
   },
 
   nombre_comportamiento() {
@@ -43,7 +43,7 @@ var ComerManzana = Accion.extend({
   },
 
   argumentos() {
-    return '{\'etiqueta\' : \'ManzanaAnimada\',  \'mensajeError\' : \'No hay una manzana aqui\' }';
+    return '{\'etiqueta\' : \'ManzanaAnimada\',  nombreAnimacion: "comerManzana"}';
   }
 });
 
@@ -59,8 +59,8 @@ var ComerBanana = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('Comer ')
-         .appendField(this.obtener_icono('../libs/data/iconos.banana.png')); //TODO: Hardcodeo feo de dir de icono
+         .appendField(this.obtener_icono('../libs/data/iconos.banana.png')) //TODO: Hardcodeo feo de dir de icono
+         .appendField('Comer banana ');
   },
 
   nombre_comportamiento() {
@@ -68,7 +68,7 @@ var ComerBanana = Accion.extend({
   },
 
   argumentos() {
-    return '{\'etiqueta\' : \'BananaAnimada\',  \'mensajeError\' : \'No hay una banana aqui\' }';
+    return '{\'etiqueta\' : \'BananaAnimada\',  nombreAnimacion: "comerBanana"}';
   }
 });
 
@@ -83,7 +83,7 @@ var TocandoManzana = Sensor.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('¿Tocando')
+         .appendField('¿Tocando manzana')
          .appendField(this.obtener_icono('../libs/data/iconos.manzana.png'))
          .appendField('?');
   },
@@ -103,7 +103,7 @@ var TocandoBanana = Sensor.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('¿Tocando')
+         .appendField('¿Tocando banana')
          .appendField(this.obtener_icono('../libs/data/iconos.banana.png'))
          .appendField('?');
   },
@@ -117,27 +117,22 @@ var TocandoBanana = Sensor.extend({
 
 
 var actividadLaEleccionDelMono = {
-  nombre: 'La Elección del Mono',
-  enunciado: '¿Podés ayudar nuevamente a nuestro mono? Esta vez siempre tiene '+
-     'una fruta para comer. ¡Pero no siempre es la misma! \n'+
+  nombre: 'La elección del mono',
+  id: 'LaEleccionDelMono',
+  enunciado: '¿Podés ayudar nuevamente a nuestro mono? Esta vez tiene '+
+     'que elegir qué fruta comer. \n'+
     'Ejecutá el programa varias veces para asegurarte que siempre funciona. \n' +
-    'Pista: Ésta vez no alcanza con el bloque "Si".',
+    'Pista: ésta vez no alcanza con el bloque "Si".',
 
-  consignaInicial: 'Si el escenario del protagonista varía, nuestro procedimiento debe utilizar alternativas condicionales que ajusten las acciones a estos cambios.',
-  
+  consignaInicial: 'Cuando sólo hay 2 opciones, alcanza con hacer una sola pregunta. En esos casos se puede usar el bloque "Si... si no".',
+
   // la escena proviene de ejerciciosPilas
   escena: LaEleccionDelMono, // jshint ignore:line
   puedeComentar: false,
   puedeDesactivar: false,
   puedeDuplicar: false,
-  subtareas: [Procedimiento],
 
-  // TODO: aca irian atributos iniciales que se desean para un personaje
-  variables: [],
-  control: [Sino],
-  expresiones: [],
-  acciones: [ComerManzana,ComerBanana,Avanzar],
-  sensores: [TocandoManzana,TocandoBanana],
+  bloques: [Procedimiento, ComerManzana,ComerBanana,Avanzar, TocandoManzana,TocandoBanana, Repetir,Si,Sino],
 };
 
 export default actividadLaEleccionDelMono;

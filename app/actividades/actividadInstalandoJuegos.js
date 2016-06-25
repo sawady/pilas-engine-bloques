@@ -1,6 +1,6 @@
 /* globals InstalandoJuegos */
 import bloques from 'pilas-engine-bloques/actividades/bloques';
-var {Accion, Si, Repetir, Hasta, Procedimiento} = bloques;
+var {Accion,  Repetir, Procedimiento} = bloques;
 
 var SiguienteCompu = Accion.extend({
 
@@ -12,8 +12,8 @@ var SiguienteCompu = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('siguiente')
-         .appendField(this.obtener_icono('derecha.png'));
+         .appendField(this.obtener_icono('derecha.png'))
+         .appendField('Siguiente compu');
   },
 
   nombre_comportamiento() {
@@ -26,9 +26,9 @@ var SiguienteCompu = Accion.extend({
 
 
 });
-/*
-var PrenderCompu = Accion.extend({
 
+
+var PrenderCompu = Accion.extend({
   init() {
     this._super();
     this.set('id', 'PrenderCompu');
@@ -37,16 +37,64 @@ var PrenderCompu = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('prender ');
-         .appendField(this.obtener_icono('derecha.png'));
+         .appendField(this.obtener_icono('../libs/data/icono.computadora.png'))
+         .appendField('Prender compu ');
   },
 
   nombre_comportamiento() {
-    return 'PrenderPorEtiqueta';
+    return 'DesencadenarAnimacionSiColisiona';
   },
 
   argumentos() {
-    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idComportamiento\' : \'prender\' }';
+    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idTransicion\' : \'prender\',\'animacionColisionado\' : \'prendida\',\'nombreAnimacion\' : \'escribir\'  }';
+  }
+
+
+});
+
+var ApagarCompu = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'ApagarCompu');
+  },
+
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField(this.obtener_icono('../libs/data/icono.computadora.png'))
+         .appendField('Apagar compu');
+  },
+
+  nombre_comportamiento() {
+    return 'DesencadenarAnimacionSiColisiona';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idTransicion\' : \'apagar\',\'animacionColisionado\' : \'parado\',\'nombreAnimacion\' : \'escribir\'  }';
+  }
+
+
+});
+
+var InstalarJuego = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'InstalarJuego');
+  },
+
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField('Instalar juego ');
+
+  },
+
+  nombre_comportamiento() {
+    return 'DesencadenarAnimacionSiColisiona';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idTransicion\' : \'instalar\',\'animacionColisionado\' : \'instalado\',\'nombreAnimacion\' : \'escribir\'  }';
   }
 
 
@@ -55,44 +103,90 @@ var PrenderCompu = Accion.extend({
 
 
 
+var EscribirC = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'EscribirC');
+  },
 
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField('Escribir "C"');
 
-apagarCompu(){
-  this.automata.hacer_luego(ApagarPorEtiqueta,{'etiqueta' : 'CompuAnimada',  'mensajeError' : 'No hay una compu aqui', 'idComportamiento' : 'apagar' });
-}
-instalarJuego(){
-  this.automata.hacer_luego(InstalarPorEtiqueta,{'etiqueta' : 'CompuAnimada',  'mensajeError' : 'No hay una compu aqui', 'idComportamiento' : 'instalar'})
-}
+  },
 
-escribirC(){
-  this.automata.hacer_luego(EscribirEnCompuAnimada,{'etiqueta' : 'CompuAnimada',  'mensajeError' : 'No hay una compu aqui', 'idComportamiento' : 'escribirC'})
-}
-escribirB(){
-  this.automata.hacer_luego(EscribirEnCompuAnimada,{'etiqueta' : 'CompuAnimada',  'mensajeError' : 'No hay una compu aqui', 'idComportamiento' : 'escribirB'})
-}
-escribirA(){
-  this.automata.hacer_luego(EscribirEnCompuAnimada,{'etiqueta' : 'CompuAnimada',  'mensajeError' : 'No hay una compu aqui', 'idComportamiento' : 'escribirA'})
+  nombre_comportamiento() {
+    return 'EscribirEnCompuAnimada';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idTransicion\' : \'escribirC\'}';
   }
-*/
+
+
+});
+
+var EscribirB = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'EscribirB');
+  },
+
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField('Escribir "B"');
+
+  },
+
+  nombre_comportamiento() {
+    return 'EscribirEnCompuAnimada';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idTransicion\' : \'escribirB\'}';
+  }
+
+
+});
+
+var EscribirA = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'EscribirA');
+  },
+
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField('Escribir "A"');
+
+  },
+
+  nombre_comportamiento() {
+    return 'EscribirEnCompuAnimada';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'CompuAnimada\',  \'mensajeError\' : \'No hay una compu aqui\', \'idTransicion\' : \'escribirA\'}';
+  }
+
+});
+
 
 var actividadInstalandoJuegos = {
   nombre: 'Instalando juegos',
-  enunciado: 'A definir',
+  id: 'InstalandoJuegos',
+  enunciado: 'Ramiro tiene que instalar un juego en 3 compus para divertirse con sus amigos. Los pasos para instalarlo en cada una son: encenderla, ingresar la contraseña ("ABC"), instalar el juego y apagar la máquina. Pista: aprovechá que en cada compu hay que hacer el mismo trabajo.',
 
   // la escena proviene de ejerciciosPilas
   escena: InstalandoJuegos, // jshint ignore:line
   puedeComentar: false,
   puedeDesactivar: false,
   puedeDuplicar: false,
-  subtareas: [Procedimiento],
 
-  // TODO: aca irian atributos iniciales que se desean para un personaje
-  variables: [],
-
-  control: [Si,Repetir,Hasta],
-  expresiones: [],
-  acciones: [SiguienteCompu],
-  sensores: [],
+  bloques: [Procedimiento, Repetir, SiguienteCompu,PrenderCompu,ApagarCompu,EscribirC,EscribirB,EscribirA,InstalarJuego],
 };
 
 export default actividadInstalandoJuegos;

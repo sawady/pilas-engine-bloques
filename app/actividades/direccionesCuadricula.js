@@ -1,5 +1,5 @@
 import bloques from 'pilas-engine-bloques/actividades/bloques';
-var {Accion} = bloques;
+var {Accion, AccionBuilder} = bloques;
 
 var IrDerecha = Accion.extend({
 
@@ -12,7 +12,7 @@ var IrDerecha = Accion.extend({
     this._super(block);
     block.appendDummyInput()
          .appendField(this.obtener_icono('derecha.png'))
-         .appendField('ir derecha');
+         .appendField('Ir derecha');
   },
 
   nombre_comportamiento() {
@@ -37,7 +37,7 @@ var IrIzquierda = Accion.extend({
     this._super(block);
     block.appendDummyInput()
          .appendField(this.obtener_icono('izquierda.png'))
-         .appendField('ir izquierda');
+         .appendField('Ir izquierda');
   },
 
   nombre_comportamiento() {
@@ -63,7 +63,7 @@ var IrArriba = Accion.extend({
     this._super(block);
     block.appendDummyInput()
          .appendField(this.obtener_icono('arriba.png'))
-         .appendField('ir arriba');
+         .appendField('Ir arriba');
   },
 
   nombre_comportamiento() {
@@ -89,7 +89,7 @@ var IrAbajo = Accion.extend({
     this._super(block);
     block.appendDummyInput()
          .appendField(this.obtener_icono('abajo.png'))
-         .appendField('ir abajo');
+         .appendField('Ir abajo');
   },
 
   nombre_comportamiento() {
@@ -103,7 +103,40 @@ var IrAbajo = Accion.extend({
 
 });
 
+var SiguienteFila = AccionBuilder.build({
+  id: 'SiguienteFila',
+  descripcion: 'Siguiente fila',
+  icono: '../../iconos/abajo.png',
+  comportamiento: 'SiguienteFila',
+  argumentos: '{}',
+});
 
-var direcciones = {IrDerecha, IrIzquierda, IrArriba, IrAbajo};
+var SiguienteFilaTotal =  SiguienteFila.extend({
+  nombre_comportamiento(){
+    return 'SecuenciaAnimada';
+  },
 
-export default direcciones;
+  argumentos(){
+    return '{secuencia: [new MoverTodoAIzquierda({}), new MoverACasillaAbajo({})]}';
+  }
+});
+
+var SiguienteColumna = AccionBuilder.build({
+  id: 'SiguienteColumna',
+  descripcion: 'Siguiente columna',
+  icono: '../../iconos/derecha.png',
+  comportamiento: 'SiguienteColumna',
+  argumentos: '{}',
+});
+
+var SiguienteColumnaTotal =  SiguienteColumna.extend({
+  nombre_comportamiento(){
+    return 'SecuenciaAnimada';
+  },
+
+  argumentos(){
+    return '{secuencia: [new MoverTodoArriba({}), new MoverACasillaDerecha({})]}';
+  }
+});
+
+export {IrDerecha, IrIzquierda, IrArriba, IrAbajo, SiguienteFila, SiguienteColumna, SiguienteFilaTotal, SiguienteColumnaTotal};

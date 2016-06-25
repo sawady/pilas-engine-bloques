@@ -10,8 +10,8 @@ var ComerBanana = Accion.extend({
   block_init: function(block) {
     this._super(block);
     block.appendDummyInput()
-          .appendField('Comer ')
-         .appendField(this.obtener_icono('../libs/data/iconos.banana.png'));
+         .appendField(this.obtener_icono('../libs/data/iconos.banana.png'))
+          .appendField('Comer banana ');
   },
 
   nombre_comportamiento: function() {
@@ -19,7 +19,7 @@ var ComerBanana = Accion.extend({
   },
 
   argumentos: function() {
-    return '{\'etiqueta\' : \'BananaAnimada\',  \'mensajeError\' : \'No hay una banana aqui\' }';
+    return '{\'etiqueta\' : \'BananaAnimada\', nombreAnimacion: "comerBanana" }';
   }
 });
 
@@ -35,8 +35,8 @@ var ComerManzana = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('Comer ')
-         .appendField(this.obtener_icono('../libs/data/iconos.manzana.png'));
+         .appendField(this.obtener_icono('../libs/data/iconos.manzana.png'))
+         .appendField('Comer manzana');
   },
 
   nombre_comportamiento() {
@@ -44,12 +44,55 @@ var ComerManzana = Accion.extend({
   },
 
   argumentos() {
-    return '{\'etiqueta\' : \'ManzanaAnimada\',  \'mensajeError\' : \'No hay una manzana aqui\' }';
+    return '{\'etiqueta\' : \'ManzanaAnimada\', nombreAnimacion: "comerManzana" }';
   }
 });
 
 
+var ComerQueso = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'ComerQueso');
+  },
 
-var comer= {ComerBanana,ComerManzana};
 
-export default comer;
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField(this.obtener_icono('../libs/data/queso.png'))
+         .appendField('Comer queso');
+  },
+
+  nombre_comportamiento() {
+    return 'RecogerPorEtiqueta';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'QuesoAnimado\' }';
+  }
+});
+
+var ComerNaranja = Accion.extend({
+  init() {
+    this._super();
+    this.set('id', 'ComerNaranja');
+  },
+
+
+  block_init(block) {
+    this._super(block);
+    block.appendDummyInput()
+         .appendField(this.obtener_icono('../libs/data/naranja.png'))
+         .appendField('Comer naranja');
+  },
+
+  nombre_comportamiento() {
+    return 'RecogerPorEtiqueta';
+  },
+
+  argumentos() {
+    return '{\'etiqueta\' : \'NaranjaAnimada\', nombreAnimacion: "comerNaranja"}';
+  }
+});
+
+export {ComerBanana,ComerManzana,ComerQueso,ComerNaranja};

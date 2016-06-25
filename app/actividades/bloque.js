@@ -1,8 +1,9 @@
 import Ember from 'ember';
+import {Comandos} from 'pilas-engine-bloques/actividades/categorias';
 
-Blockly.Blocks.primitivas = { COLOUR: '#4a6cd4' };
-Blockly.Blocks.sensores = { COLOUR: '#4a6cd4' };
-Blockly.Blocks.eventos = { COLOUR: '#4a6cd4' };
+Blockly.Blocks.primitivas = { };
+Blockly.Blocks.sensores = { };
+Blockly.Blocks.eventos = { };
 
 /*
  * Representa un bloque
@@ -25,13 +26,21 @@ var Bloque = Ember.Object.extend({
   },
 
   registrar_en_blockly() {
+    this.registrarVista();
+    this.registrarGeneracionJS();
+  },
+
+  registrarVista(){
     var myThis = this;
     Blockly.Blocks[this.get('id')] = {
       init() {
         myThis.block_init(this);
       }
     };
+  },
 
+  registrarGeneracionJS(){
+    var myThis = this;
     Blockly.JavaScript[this.get('id')] = function(block) {
       return myThis.block_javascript(block);
     };
@@ -56,6 +65,12 @@ var Bloque = Ember.Object.extend({
     return new Blockly.FieldImage('iconos/' + nombre, 16, 16, '<');
   },
 
+  categoria(){
+    return this._categoria;
+  },
+
+  _categoria: Comandos,
+
   // Escupe el código que va en el toolbox para el bloque
   build() {
     var str_block = '';
@@ -67,6 +82,12 @@ var Bloque = Ember.Object.extend({
 
     str_block += '</block>';
     return str_block;
+  }
+});
+
+Bloque.reopenClass({
+  categoria(){
+    return this.create().categoria();
   }
 });
 

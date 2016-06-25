@@ -1,165 +1,44 @@
-/*
-
-siguienteFila(){
- this.robot.hacer_luego(avanzarFilaEnCuadriculaMultiple,{'cuadriculaMultiple':this.cuadricula})
-}*/
-
 import bloques from 'pilas-engine-bloques/actividades/bloques';
-var {Accion, Sensor, Si,Repetir,Procedimiento,Hasta} = bloques;
+import direccionesCuadricula from 'pilas-engine-bloques/actividades/direccionesCuadricula';
+var {AccionBuilder, Repetir, Si, Sino, Procedimiento, Hasta} = bloques;
+var {IrDerecha, IrIzquierda, SiguienteFila} = direccionesCuadricula;
 
-var Avanzar = Accion.extend({
-  init() {
-    this._super();
-    this.set('id', 'Avanzar');
-  },
-
-  block_init(block) {
-    this._super(block);
-    block.appendDummyInput()
-         .appendField('avanzar')
-         .appendField(this.obtener_icono('derecha.png'));
-  },
-
-  nombre_comportamiento() {
-    return 'MoverACasillaDerecha';
-  },
-
-  argumentos() {
-    return '{}';
-  }
+var PatearPelota = AccionBuilder.build({
+  id: 'PatearPelota',
+  descripcion: 'Patear pelota',
+  icono: 'iconos.pelota.png',
+  comportamiento: 'DesencadenarComportamientoSiColisiona',
+  argumentos: '{"comportamiento":SerPateado, idTransicion:"patear", etiqueta:"PelotaAnimada", argumentosComportamiento: {tiempoEnElAire:25,aceleracion:0.0025,elevacionMaxima:25,gradosDeAumentoStep:-2}}',
 });
 
-var Atras = Accion.extend({
-  init() {
-    this._super();
-    this.set('id', 'Atras');
-  },
-
-  block_init(block) {
-    this._super(block);
-    block.appendDummyInput()
-     .appendField('atrás')
-     .appendField(this.obtener_icono('izquierda.png'));
-   },
-
-  nombre_comportamiento() {
-    return 'MoverACasillaIzquierda';
-  },
-
-  argumentos() {
-    return '{}';
-  }
+var TocandoInicio = AccionBuilder.buildSensor({
+  id: 'tocandoInicio',
+  descripcion: 'Estoy al inicio',
+  icono: 'iconos.futbolInicio.png',
+  funcionSensor: 'tocandoInicio()',
 });
 
-var SiguienteFila = Accion.extend({
-  init() {
-    this._super();
-    this.set('id', 'SiguienteFila');
-  },
-
-  block_init(block) {
-    this._super(block);
-    block.appendDummyInput()
-         .appendField('siguiente fila')
-         .appendField(this.obtener_icono('abajo.png'));
-  },
-
-  nombre_comportamiento() {
-    return 'avanzarFilaEnCuadriculaMultiple';
-  },
-
-  argumentos() {
-    return '{}';
-  }
+var TocandoPelota = AccionBuilder.buildSensor({
+  id: 'tocandoPelota',
+  descripcion: 'Llegué a la pelota',
+  icono: 'iconos.pelota.png',
+  funcionSensor: 'tocando("PelotaAnimada")',
 });
 
-
-var PatearPelota = Accion.extend({
-  init() {
-    this._super();
-    this.set('id', 'PatearPelota');
-  },
-
-  block_init(block) {
-    this._super(block);
-    block.appendDummyInput()
-         .appendField('patear')
-         .appendField(this.obtener_icono('../libs/data/iconos.pelota.png'));
-  },
-
-  nombre_comportamiento() {
-    return 'DesencadenarHabilidadSiColiciona';
-  },
-
-  argumentos() {
-    return '{"Habilidad":SerPateado,\'etiqueta\':\'PelotaAnimada\',\'mensajeError\': \'No hay una pelota aquí\',\'argumentosHabilidad\':{\'tiempoEnElAire\':25,\'aceleracion\':0.0025,\'elevacionMaxima\':25,\'gradosDeAumentoStep\':-2}}';
-  }
-});
-
-
-
-var TocandoInicio = Sensor.extend({
-  init() {
-    this._super();
-    this.set('id', 'tocandoInicio');
-  },
-
-  block_init(block) {
-    this._super(block);
-    block.appendDummyInput()
-         .appendField('¿tocando')
-         .appendField(this.obtener_icono('../libs/data/iconos.futbolInicio.png'))
-         .appendField('?');
-
-  },
-
-  nombre_sensor() {
-    return 'tocandoInicio()';
-  }
-});
-
-var TocandoPelota = Sensor.extend({
-  init() {
-    this._super();
-    this.set('id', 'tocandoPelota');
-  },
-
-  block_init(block) {
-    this._super(block);
-    block.appendDummyInput()
-         .appendField('¿tocando')
-         .appendField(this.obtener_icono('../libs/data/iconos.pelota.png'))
-         .appendField('?');
-  },
-
-  nombre_sensor() {
-    return 'tocando(\'PelotaAnimada\')';
-  }
-});
-
-
-
-var actividadFutbolRobots = {
-  nombre: 'Fútbol de Robots',
+export default {
+  nombre: 'Fútbol para robots',
+  id: 'FutbolRobots',
   enunciado: 'Ayudá a nuestro robot futbolista a patear todas las pelotas. ' +
-    'Recordá siempre que una buena división en tareas puede ayudarte a encarar '+
+    'Recordá siempre que una buena división en procedimientos puede ayudarte a encarar '+
     'mejor el problema.',
 
-  consignaInicial: 'El procedimiento que se defina debe considerar el escenario variable del protagonista y ofrecer una solución con la menor cantidad de bloques posibles. Es importante tener en cuenta que la acción se repite varias veces y que la longitud de las filas varía.',
+  consignaInicial: 'El procedimiento que se defina debe considerar el escenario variable y ofrecer una solución con poca cantidad de bloques. Es importante tener en cuenta que la acción se repite varias veces y que la longitud de las filas varía.',
 
   // la escena proviene de ejerciciosPilas
   escena: FutbolRobots, // jshint ignore:line
   puedeComentar: false,
   puedeDesactivar: false,
   puedeDuplicar: false,
-  subtareas: [Procedimiento],
 
-  // TODO: aca irian atributos iniciales que se desean para un personaje
-  variables: [],
-  control: [Si,Repetir,Hasta],
-  expresiones: [],
-  acciones: [Avanzar,Atras,SiguienteFila,PatearPelota],
-  sensores: [TocandoInicio,TocandoPelota],
+  bloques: [Procedimiento, IrDerecha,IrIzquierda,SiguienteFila,PatearPelota, TocandoInicio,TocandoPelota, Repetir,Si,Sino,Hasta],
 };
-
-export default actividadFutbolRobots;

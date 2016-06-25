@@ -1,7 +1,7 @@
 import bloques from 'pilas-engine-bloques/actividades/bloques';
 import direcciones from 'pilas-engine-bloques/actividades/direccionesCuadricula';
 
-var {Accion, /*Sensor,*/ Repetir,Si,Procedimiento} = bloques;
+var {Accion, Repetir,Procedimiento} = bloques;
 var {IrDerecha, IrArriba} = direcciones;
 
 var VolverABordeIzquierdo = Accion.extend({
@@ -14,9 +14,8 @@ var VolverABordeIzquierdo = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-    .appendField('volver todo a ')
-    .appendField(this.obtener_icono('izquierda.png'));
-
+    .appendField(this.obtener_icono('izquierda.png'))
+    .appendField('Volver todo a izquierda');
   },
 
   nombre_comportamiento() {
@@ -40,8 +39,8 @@ var TomarEstrella = Accion.extend({
   block_init(block) {
     this._super(block);
     block.appendDummyInput()
-         .appendField('tomar ')
-         .appendField(this.obtener_icono('../libs/data/icono.estrella.png'));
+         .appendField(this.obtener_icono('../libs/data/icono.estrella.png'))
+         .appendField('Tomar ');
   },
 
   nombre_comportamiento() {
@@ -58,22 +57,15 @@ var TomarEstrella = Accion.extend({
 
 var actividadElRecolectorDeEstrellas = {
   nombre: 'El recolector de estrellas',
-  enunciado: 'A definir.',
-  consignaInicial: 'A definir.',
-
+  id: 'ElRecolectorDeEstrellas',
+  enunciado: 'Ayudá a nuestro personaje a recolectar todas las estrellas. Pista: podés hacer un procedimiento que tome una fila de estrellas.',
+  consignaInicial: 'Usar muchas veces un procedimiento te ahorra trabajo.',
   escena: ElRecolectorDeEstrellas,
   puedeComentar: false,
   puedeDesactivar: false,
   puedeDuplicar: false,
-  subtareas: [Procedimiento],
 
-  // TODO: aca irian atributos iniciales que se desean para un personaje
-  variables: [],
-
-  control: [Repetir,Si],
-  expresiones: [],
-  acciones: [IrDerecha, IrArriba,VolverABordeIzquierdo,TomarEstrella],
-  sensores: []
+  bloques: [Procedimiento, Repetir, IrDerecha, IrArriba,VolverABordeIzquierdo,TomarEstrella],
 };
 
 export default actividadElRecolectorDeEstrellas;

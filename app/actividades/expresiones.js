@@ -1,7 +1,10 @@
 import Bloque from 'pilas-engine-bloques/actividades/bloque';
+import {Operadores, Valores} from 'pilas-engine-bloques/actividades/categorias';
 
 
 var ExpresionDeBlockly = Bloque.extend({
+
+  _categoria: Operadores,
 
   registrar_en_blockly() {
     // pisado porque ya viene con blockly
@@ -10,7 +13,20 @@ var ExpresionDeBlockly = Bloque.extend({
 
 });
 
+var Texto = ExpresionDeBlockly.extend({
+
+  _categoria: Valores,
+
+  init() {
+    this._super();
+    this.set('id', 'text');
+  },
+});
+
 var Numero = ExpresionDeBlockly.extend({
+
+  _categoria: Valores,
+
   init() {
     this._super();
     this.set('id', 'math_number');
@@ -25,6 +41,7 @@ var OpAritmetica = ExpresionDeBlockly.extend({
 });
 
 var Booleano = ExpresionDeBlockly.extend({
+  _categoria: Valores,
   init() {
     this._super();
     this.set('id', 'logic_boolean');
@@ -52,11 +69,7 @@ var OpNegacion = ExpresionDeBlockly.extend({
   },
 });
 
-
-var expresiones = {
+export {
   ExpresionDeBlockly, Numero, OpAritmetica, Booleano,
-  OpComparacion, OpLogica, OpNegacion
+  OpComparacion, OpLogica, OpNegacion, Texto
 };
-
-
-export default expresiones;
